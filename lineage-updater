@@ -80,12 +80,19 @@ def filename_properties(pathname):
     if fields[1] != 'ota':
         raise ValueError("Not an OTA file")
     (project, device) = fields[0].split('_', 1)
+    incr_fields = fields[4].split('_')
+    if len(incr_fields) > 2:
+        raise ValueError("Incorrect incremental value")
     props = dict()
     props['project'] = project
     props['device'] = device
     props['version'] = fields[2]
     props['buildtype'] = fields[3]
-    props['incremental'] = fields[4]
+    if len(incr_fields) == 1:
+        props['incremental'] = incr_fields[0]
+    else:
+        props['incrbase'] = incr_fields[0]
+        props['incremental'] = incr_fields[1]
 
     return props
 
@@ -172,17 +179,23 @@ def find_roms(device=None, buildtype=None, incremental=None):
         if buildtype and props['buildtype'] != buildtype:
             continue
         if incremental:
-            try:
-                req_incr_stamp = incremental_stamp(incremental)
-            except ValueError:
-                continue
-            try:
-                ota_incr_stamp = incremental_stamp(props['incremental'])
-            except ValueError:
-                dbg("Failed to parse cache incremental field")
-                continue
-            if ota_incr_timestamp <= req_incr_timestamp:
-                continue
+            if 'incrbase' in props:
+                # Incremental
+                if incremental != props['incrbase']:
+                    continue
+            else:
+                # Full
+                try:
+                    req_incr_stamp = incremental_stamp(incremental)
+                except ValueError:
+                    continue
+                try:
+                    ota_incr_stamp = incremental_stamp(props['incremental'])
+                except ValueError:
+                    dbg("Failed to parse cache incremental field")
+                    continue
+                if ota_incr_stamp <= req_incr_stamp:
+                    continue
 
         roms.append(v)
 

@@ -19,13 +19,18 @@
 ## Usage
 The script expects OTA files to be named as follows:
 
-_project_\__device_-ota-_version_-_buildtype_-_incremental_.zip
+Full OTA files:
+* _project_\__device_-ota-_version_-_buildtype_-_incremental_.zip
+
+Incremental OTA files:
+* _project_\__device_-ota-_version_-_buildtype_-_base_\__incremental_.zip
 
 Where:
 * _project_ is the project/ROM name, eg. "lineage".
 * _device_ is the device name, eg. "mako".
 * _version_ is the project/ROM version, eg. "16.0".
 * _buildtype_ is the buildtype, eg. "unofficial".
+* _base_ is the base incremental version (the starting build).
 * _incremental_ is the incremental version, eg. "eng.user.20200807.162000".
 
 The default OTA and target-files file names include all of these fields
@@ -33,7 +38,9 @@ except _incremental_.  This is the value of `ro.build.version.incremental`
 in the system build properties.  It is different from `ro.build.date.utc`.
 They are __not__ interchangeable.
 
-Example: lineage_mako-ota-16.0-unofficial-eng.user.20200807.162000.zip
+Examples:
+* lineage_mako-ota-16.0-unofficial-eng.user.20200807.162000.zip
+* lineage_mako-ota-16.0-unofficial-eng.user.20200806.162000_eng.user.20200807.162000.zip
 
 The OTA directory may contain subdirectories of arbitrary depth.
 
